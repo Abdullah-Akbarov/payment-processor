@@ -13,6 +13,8 @@ public class UserDto {
     private Long id;
     @Size(min = 8, max = 32, message = "password must be minimum 8 maximum 32 characters long")
     private String password;
+    @Size(min = 5, max = 16, message = "username must be minimum 5 maximum 16 characters long")
+    private String username;
     @Pattern(regexp = "^\\+998.*", message = "Wrong country code")
     @Size(min = 13, max = 13, message = "Wrong number")
     private String phoneNumber;
@@ -35,6 +37,22 @@ public class UserDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username.toLowerCase();
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getFirstName() {
