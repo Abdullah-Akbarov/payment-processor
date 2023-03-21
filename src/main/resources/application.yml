@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: void
+    url: jdbc:postgresql://localhost:5432/payment_system
+  jpa:
+    hibernate:
+      ddl-auto: update
