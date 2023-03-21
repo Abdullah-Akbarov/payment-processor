@@ -4,9 +4,8 @@ import com.zero.paymentprocessor.domain.enums.CardCategory;
 import com.zero.paymentprocessor.domain.enums.CardType;
 
 import javax.persistence.*;
-import java.time.YearMonth;
 
-@Entity
+@Entity(name = "card")
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +19,8 @@ public class Card {
     private CardType cardType;
     @Enumerated(EnumType.STRING)
     private CardCategory cardCategory;
-    private YearMonth yearMonth;
+    @Column(nullable = false)
+    private String expireDate;
+    @ManyToOne
+    private User user;
 }

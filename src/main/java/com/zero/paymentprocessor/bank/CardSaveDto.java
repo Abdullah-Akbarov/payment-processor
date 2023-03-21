@@ -5,10 +5,9 @@ import com.zero.paymentprocessor.domain.enums.CardType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.time.YearMonth;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,12 +15,15 @@ public class CardSaveDto {
     @Size(min = 16, max = 16, message = "Wrong card number, card number should be 16 digits")
     @Pattern(regexp = "\\d+", message = "Card number can only contain digits")
     private String cardNumber;
+    @NotNull(message = "CardHolder cannot be empty")
     private String CardHolder;
-    @NotEmpty(message = "CardType cannot be empty")
+    @NotNull(message = "CardType cannot be empty")
     private CardType cardType;
-    @NotEmpty(message = "CardCategory cannot be empty")
+    @NotNull(message = "CardCategory cannot be empty")
     private CardCategory cardCategory;
-    private YearMonth expireDate;
+    @NotNull(message = "expire date cannot be empty")
+    private String expireDate;
+    @Size(min = 4, max = 4, message = "passcode should be 4 digits long")
     private String passCode;
     private Double balance;
 
@@ -57,13 +59,6 @@ public class CardSaveDto {
         this.cardCategory = cardCategory;
     }
 
-    public YearMonth getExpireDate() {
-        return expireDate;
-    }
-
-    public void setExpireDate(YearMonth expireDate) {
-        this.expireDate = expireDate;
-    }
 
     public String getPassCode() {
         return passCode;
@@ -71,5 +66,21 @@ public class CardSaveDto {
 
     public void setPassCode(String passCode) {
         this.passCode = passCode;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
+    public String getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(String expireDate) {
+        this.expireDate = expireDate;
     }
 }

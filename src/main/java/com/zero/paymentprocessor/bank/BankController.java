@@ -4,7 +4,6 @@ import com.zero.paymentprocessor.dto.CardDto;
 import com.zero.paymentprocessor.dto.UpdateBalanceDto;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,9 +13,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class BankController {
     private final CardService cardService;
-    private final ModelMapper mapper;
-
-    @GetMapping("/validate")
+    @PostMapping("/validate")
     public ResponseModel validate(@Valid @RequestBody CardDto cardDto) {
         return cardService.validateCard(cardDto);
     }
@@ -33,7 +30,7 @@ public class BankController {
 
     @PostMapping
     public ResponseModel saveCard(@Valid @RequestBody CardSaveDto cardSaveDto) {
-        return cardService.saveCard(mapper.map(cardSaveDto, Card.class));
+        return cardService.saveCard(cardSaveDto);
     }
 
     @PutMapping

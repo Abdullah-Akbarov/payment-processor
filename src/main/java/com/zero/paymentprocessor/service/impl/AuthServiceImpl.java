@@ -44,7 +44,6 @@ public class AuthServiceImpl implements AuthService {
         }
         return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
     }
-
     private void encodePassword(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
     }

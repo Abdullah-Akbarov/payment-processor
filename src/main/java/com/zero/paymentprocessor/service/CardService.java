@@ -9,4 +9,6 @@ public interface CardService {
     ResponseModel removeCard(String cardNumber);
 
     ResponseModel transfer(String sender, String receiver);
+
+    ResponseModel balance(String cardNumber);
 }

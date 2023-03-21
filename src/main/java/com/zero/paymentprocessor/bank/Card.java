@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.YearMonth;
 
 @Entity(name = "bank_card")
 @Getter
@@ -25,8 +24,9 @@ public class Card {
     @Enumerated(EnumType.STRING)
     private CardCategory cardCategory;
     @Column(nullable = false)
-    private YearMonth expireDate;
+    private String expireDate;
     @Column(nullable = false)
     private String passCode;
+    @Column(nullable = false)
     private Double balance;
 }

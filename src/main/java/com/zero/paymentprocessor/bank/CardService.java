@@ -5,6 +5,7 @@ import com.zero.paymentprocessor.dto.UpdateBalanceDto;
 import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class CardService {
     private final PasswordEncoder encoder;
     private final CardRepository cardRepository;
+    private final ModelMapper mapper;
 
     public ResponseModel getCard(String cardNumber) {
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
@@ -37,9 +39,8 @@ public class CardService {
     public ResponseModel validateCard(CardDto cardDto) {
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardDto.getCardNumber());
         if (byCardNumber.isPresent()) {
-            String encrypt = encrypt(cardDto.getPassCode());
-            if (encoder.matches(encrypt, byCardNumber.get().getPassCode()) &&
-                    cardDto.getDateTime().equals(byCardNumber.get().getExpireDate())) {
+            String decrypt = decrypt(cardDto.getPassCode());
+            if (encoder.matches(decrypt, byCardNumber.get().getPassCode()) && cardDto.getExpireDate().equals(byCardNumber.get().getExpireDate())) {
                 return new ResponseModel(MessageModel.SUCCESS);
             }
             return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
@@ -47,10 +48,12 @@ public class CardService {
         return new ResponseModel(MessageModel.NOT_FOUND);
     }
 
-    public ResponseModel saveCard(Card card) {
-        if (cardRepository.findByCardNumber(card.getCardNumber()).isPresent()) {
+    public ResponseModel saveCard(CardSaveDto cardSaveDto) {
+        System.out.println(cardSaveDto.getExpireDate());
+        if (cardRepository.findByCardNumber(cardSaveDto.getCardNumber()).isPresent()) {
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
+        Card card = mapper.map(cardSaveDto, Card.class);
         encodePassCode(card);
         Card save = cardRepository.save(card);
         if (save != null) {
@@ -70,7 +73,7 @@ public class CardService {
         return new ResponseModel(MessageModel.COULD_NOT_UPDATE_RECORD);
     }
 
-    private String encrypt(String passCode) {
+    private String decrypt(String passCode) {
         String password = "myBankSecretKey";
         String salt = "5c0744940b5c369b";
         TextEncryptor text = Encryptors.text(password, salt);

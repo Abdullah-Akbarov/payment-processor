@@ -33,7 +33,6 @@ public class User implements UserDetails {
     private String lastName;
     @OneToMany
     private Set<Card> cards;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
