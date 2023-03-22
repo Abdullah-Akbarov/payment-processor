@@ -7,6 +7,7 @@ import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import com.zero.paymentprocessor.repository.UserRepository;
 import com.zero.paymentprocessor.service.AuthService;
+import com.zero.paymentprocessor.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,13 +21,13 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
     public ResponseModel login(UserLoginDto userLoginDto) {
-        Optional<User> byUsername = userRepository.findByUsername(userLoginDto.getUsername());
         Optional<User> username = userRepository.findByUsername(userLoginDto.getUsername());
         if (username.isPresent() && encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
-            return new ResponseModel(); // TODO jwt token
+            return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(username.get()));
         }
         return new ResponseModel(404, "incorrect username or password");
     }
@@ -40,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         encodePassword(user);
         User save = userRepository.save(user);
         if (save.getId() != null) {
-            return new ResponseModel(MessageModel.SUCCESS);
+            return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(save));
         }
         return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
     }

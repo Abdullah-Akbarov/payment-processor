@@ -2,6 +2,7 @@ package com.zero.paymentprocessor.service.impl;
 
 import com.zero.paymentprocessor.domain.Card;
 import com.zero.paymentprocessor.domain.Transaction;
+import com.zero.paymentprocessor.domain.User;
 import com.zero.paymentprocessor.dto.BalanceDto;
 import com.zero.paymentprocessor.dto.CardDto;
 import com.zero.paymentprocessor.dto.TransactionDto;
@@ -13,6 +14,8 @@ import com.zero.paymentprocessor.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
@@ -42,8 +45,13 @@ public class CardServiceImpl implements CardService {
         ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
         if (response.getBody().status == 200) {
             Card card = mapper.map(cardDto, Card.class);
-            // Todo get current authorized user and set;
-            return new ResponseModel();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            card.setUser((User) authentication.getPrincipal());
+            Card save = cardRepository.save(card);
+            if (save.getId() != null) {
+                return new ResponseModel(MessageModel.SUCCESS);
+            }
+            return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
         }
         return new ResponseModel(MessageModel.CARD_NOT_FOUND);
     }
@@ -72,7 +80,10 @@ public class CardServiceImpl implements CardService {
                 boolean receiver = updateBalance(new BalanceDto(transactionDto.getReceiver(), transactionDto.getAmount()));
                 if (sender && receiver) {
                     transactionDto.setDateTime(new Timestamp(System.currentTimeMillis()));
-                    transactionRepository.save(mapper.map(transactionDto, Transaction.class));
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    Transaction map = mapper.map(transactionDto, Transaction.class);
+                    map.setUser((User) authentication.getPrincipal());
+                    transactionRepository.save(map);
                 }
                 return new ResponseModel(MessageModel.SUCCESS);
             }

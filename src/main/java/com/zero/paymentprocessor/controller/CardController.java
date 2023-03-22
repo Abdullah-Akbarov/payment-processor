@@ -20,12 +20,12 @@ public class CardController {
         return cardService.addCard(cardDto);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/remove")
     public ResponseModel removeCard(@RequestParam String cardNumber) {
         return cardService.removeCard(cardNumber);
     }
 
-    @PutMapping
+    @PutMapping("/transfer")
     public ResponseModel transfer(@Valid @RequestBody TransactionDto transactionDto) {
         return cardService.transfer(transactionDto);
     }

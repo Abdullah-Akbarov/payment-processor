@@ -2,10 +2,18 @@ package com.zero.paymentprocessor.domain;
 
 import com.zero.paymentprocessor.domain.enums.CardCategory;
 import com.zero.paymentprocessor.domain.enums.CardType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity(name = "card")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
