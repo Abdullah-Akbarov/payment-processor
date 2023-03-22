@@ -1,7 +1,7 @@
 package com.zero.paymentprocessor.bank;
 
+import com.zero.paymentprocessor.dto.BalanceDto;
 import com.zero.paymentprocessor.dto.CardDto;
-import com.zero.paymentprocessor.dto.UpdateBalanceDto;
 import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
@@ -56,18 +56,18 @@ public class CardService {
         Card card = mapper.map(cardSaveDto, Card.class);
         encodePassCode(card);
         Card save = cardRepository.save(card);
-        if (save != null) {
+        if (save.getId() != null) {
             return new ResponseModel(MessageModel.SUCCESS);
         }
         return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
     }
 
-    public ResponseModel updateBalance(UpdateBalanceDto balanceDto) {
+    public ResponseModel updateBalance(BalanceDto balanceDto) {
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(balanceDto.getCardNumber());
         Card card = byCardNumber.get();
         card.setBalance(card.getBalance() + balanceDto.getAmount());
         Card save = cardRepository.save(card);
-        if (save != null) {
+        if (save.getId() != null) {
             return new ResponseModel(MessageModel.SUCCESS);
         }
         return new ResponseModel(MessageModel.COULD_NOT_UPDATE_RECORD);

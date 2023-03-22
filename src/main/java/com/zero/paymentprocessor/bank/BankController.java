@@ -1,7 +1,7 @@
 package com.zero.paymentprocessor.bank;
 
+import com.zero.paymentprocessor.dto.BalanceDto;
 import com.zero.paymentprocessor.dto.CardDto;
-import com.zero.paymentprocessor.dto.UpdateBalanceDto;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +33,8 @@ public class BankController {
         return cardService.saveCard(cardSaveDto);
     }
 
-    @PutMapping
-    public ResponseModel updateBalance(@RequestBody UpdateBalanceDto balanceDto) {
+    @PutMapping("/update")
+    public ResponseModel updateBalance(@RequestBody BalanceDto balanceDto) {
         return cardService.updateBalance(balanceDto);
     }
 

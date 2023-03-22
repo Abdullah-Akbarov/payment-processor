@@ -1,6 +1,7 @@
 package com.zero.paymentprocessor.controller;
 
 import com.zero.paymentprocessor.dto.CardDto;
+import com.zero.paymentprocessor.dto.TransactionDto;
 import com.zero.paymentprocessor.model.ResponseModel;
 import com.zero.paymentprocessor.service.CardService;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,8 @@ public class CardController {
     }
 
     @PutMapping
-    public ResponseModel transfer(@RequestParam String sender, @RequestParam String receiver) {
-        return cardService.transfer(sender, receiver);
+    public ResponseModel transfer(@Valid @RequestBody TransactionDto transactionDto) {
+        return cardService.transfer(transactionDto);
     }
 
     @GetMapping("/balance")
