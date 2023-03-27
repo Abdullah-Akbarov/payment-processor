@@ -5,5 +5,12 @@ spring:
     password: password
     url: jdbc:postgresql://localhost:5432/payment_system
   jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
     hibernate:
       ddl-auto: update
+jwt:
+  secret: mySecretKeyword

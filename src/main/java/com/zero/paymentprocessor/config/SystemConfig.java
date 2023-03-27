@@ -7,9 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
+
+import static java.lang.String.format;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,10 +37,13 @@ public class SystemConfig {
     public HttpHeaders headers() {
         return new HttpHeaders();
     }
-
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username).get();
+        return username -> userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException(
+                                format("User: %s, not found", username)
+                        ));
     }
 }
 

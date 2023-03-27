@@ -38,6 +38,9 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public ResponseModel addCard(CardDto cardDto) {
+        if (cardRepository.findByCardNumber(cardDto.getCardNumber()).isPresent()) {
+            return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
+        }
         encrypt(cardDto);
         String url = "http://localhost:8080/bank/validate";
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -70,6 +73,16 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public ResponseModel transfer(TransactionDto transactionDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Transaction map = mapper.map(transactionDto, Transaction.class);
+        User user = (User) authentication.getPrincipal();
+        Optional<Card> byCardNumber = cardRepository.findByCardNumber(transactionDto.getSender());
+        if (!byCardNumber.isPresent()) {
+            return new ResponseModel(MessageModel.SENDER_NOT_FOUND);
+        }
+        if (byCardNumber.get().getUser().getId() != user.getId()) {
+            return new ResponseModel(MessageModel.UNAUTHORIZED);
+        }
         if (!checkCard(transactionDto.getReceiver()) || !checkCard(transactionDto.getSender())) {
             return new ResponseModel(MessageModel.NOT_FOUND);
         }
@@ -80,9 +93,7 @@ public class CardServiceImpl implements CardService {
                 boolean receiver = updateBalance(new BalanceDto(transactionDto.getReceiver(), transactionDto.getAmount()));
                 if (sender && receiver) {
                     transactionDto.setDateTime(new Timestamp(System.currentTimeMillis()));
-                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                    Transaction map = mapper.map(transactionDto, Transaction.class);
-                    map.setUser((User) authentication.getPrincipal());
+                    map.setUser(user);
                     transactionRepository.save(map);
                 }
                 return new ResponseModel(MessageModel.SUCCESS);

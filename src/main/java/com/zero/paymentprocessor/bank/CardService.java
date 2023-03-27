@@ -30,10 +30,7 @@ public class CardService {
 
     public ResponseModel getBalance(String cardNumber) {
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
-        if (byCardNumber.isPresent()) {
-            return new ResponseModel(MessageModel.SUCCESS, byCardNumber.get().getBalance());
-        }
-        return new ResponseModel(MessageModel.NOT_FOUND);
+        return byCardNumber.map(card -> new ResponseModel(MessageModel.SUCCESS, card.getBalance())).orElseGet(() -> new ResponseModel(MessageModel.NOT_FOUND));
     }
 
     public ResponseModel validateCard(CardDto cardDto) {
@@ -49,7 +46,6 @@ public class CardService {
     }
 
     public ResponseModel saveCard(CardSaveDto cardSaveDto) {
-        System.out.println(cardSaveDto.getExpireDate());
         if (cardRepository.findByCardNumber(cardSaveDto.getCardNumber()).isPresent()) {
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
