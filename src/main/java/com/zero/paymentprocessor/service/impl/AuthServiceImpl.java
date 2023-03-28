@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
         if (username.isPresent() && encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
             return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(username.get()));
         }
-        return new ResponseModel((MessageModel.AUTHENTICATION_FAILED);
+        return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
     }
 
     @Override
