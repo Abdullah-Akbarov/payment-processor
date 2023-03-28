@@ -42,11 +42,7 @@ public class CardServiceImpl implements CardService {
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         encrypt(cardDto);
-        String url = "http://localhost:8080/bank/validate";
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<CardDto> entity = new HttpEntity<>(cardDto, headers);
-        ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
-        if (response.getBody().status == 200) {
+        if (validateCard(cardDto)) {
             Card card = mapper.map(cardDto, Card.class);
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             card.setUser((User) authentication.getPrincipal());
@@ -73,14 +69,8 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public ResponseModel transfer(TransactionDto transactionDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Transaction map = mapper.map(transactionDto, Transaction.class);
-        User user = (User) authentication.getPrincipal();
-        Optional<Card> byCardNumber = cardRepository.findByCardNumber(transactionDto.getSender());
-        if (!byCardNumber.isPresent()) {
-            return new ResponseModel(MessageModel.SENDER_NOT_FOUND);
-        }
-        if (byCardNumber.get().getUser().getId() != user.getId()) {
+        User user = isAuthorized(transactionDto.getSender());
+        if (user == null) {
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
         if (!checkCard(transactionDto.getReceiver()) || !checkCard(transactionDto.getSender())) {
@@ -88,7 +78,8 @@ public class CardServiceImpl implements CardService {
         }
         Double balance = getBalance(transactionDto.getSender());
         if (balance != null) {
-            if (balance > transactionDto.getAmount()) {
+            if (balance >= transactionDto.getAmount()) {
+                Transaction map = mapper.map(transactionDto, Transaction.class);
                 boolean sender = updateBalance(new BalanceDto(transactionDto.getSender(), -1 * transactionDto.getAmount()));
                 boolean receiver = updateBalance(new BalanceDto(transactionDto.getReceiver(), transactionDto.getAmount()));
                 if (sender && receiver) {
@@ -105,6 +96,9 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public ResponseModel balance(String cardNumber) {
+        if (isAuthorized(cardNumber) == null) {
+            return new ResponseModel(MessageModel.UNAUTHORIZED);
+        }
         Double balance = getBalance(cardNumber);
         if (balance != null) {
             return new ResponseModel(MessageModel.SUCCESS, balance);
@@ -135,7 +129,7 @@ public class CardServiceImpl implements CardService {
     private ResponseModel getRequests(String cardNumber, String path) {
         String url = "http://localhost:8080/bank/" + path;
         headers.set("Accept", "application/json");
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("cardNumber", cardNumber);
 
         HttpEntity entity = new HttpEntity(headers);
@@ -163,5 +157,21 @@ public class CardServiceImpl implements CardService {
                 requestEntity,
                 ResponseModel.class);
         return response.getBody().status == 200;
+    }
+    private boolean validateCard(CardDto cardDto){
+        String url = "http://localhost:8080/bank/validate";
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<CardDto> entity = new HttpEntity<>(cardDto, headers);
+        ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
+        return response.getBody().status == 200;
+    }
+    private User isAuthorized(String cardNumber){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
+        if (!byCardNumber.isPresent()){
+            return null;
+        }
+        return byCardNumber.get().getUser().getId() == user.getId() ? user : null;
     }
 }
