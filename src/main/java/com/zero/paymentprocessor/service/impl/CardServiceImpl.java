@@ -57,6 +57,9 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public ResponseModel removeCard(String cardNumber) {
+        if (isAuthorized(cardNumber) == null){
+            return new ResponseModel(MessageModel.UNAUTHORIZED);
+        }
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
         if (byCardNumber.isPresent()) {
             if (cardRepository.deleteCardByCardNumber(cardNumber) == 1) {
