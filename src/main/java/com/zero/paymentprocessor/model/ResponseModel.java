@@ -1,3 +1,7 @@
+/**
+ * Custom response model
+ */
+
 package com.zero.paymentprocessor.model;
 
 import lombok.AllArgsConstructor;
@@ -7,9 +11,6 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-/**
- * Custom response model
- */
 public class ResponseModel {
     public Integer status;
     public String message;

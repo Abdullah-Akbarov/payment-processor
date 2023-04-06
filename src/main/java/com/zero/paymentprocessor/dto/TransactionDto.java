@@ -1,3 +1,7 @@
+/**
+ * This class represents Transaction details;
+ */
+
 package com.zero.paymentprocessor.dto;
 
 import lombok.AllArgsConstructor;

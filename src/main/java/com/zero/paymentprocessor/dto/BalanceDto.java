@@ -1,3 +1,6 @@
+/**
+ * This class represents Balance details such as cardNumber and amount.
+ */
 package com.zero.paymentprocessor.dto;
 
 import lombok.AllArgsConstructor;

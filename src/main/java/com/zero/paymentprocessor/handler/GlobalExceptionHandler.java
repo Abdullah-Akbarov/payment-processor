@@ -1,3 +1,7 @@
+/**
+ * This class is used to handle global exceptions.
+ */
+
 package com.zero.paymentprocessor.handler;
 
 import com.zero.paymentprocessor.model.MessageModel;

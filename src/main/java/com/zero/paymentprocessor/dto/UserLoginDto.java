@@ -1,14 +1,18 @@
+/**
+ * This class represents userLogin details such as username and password.
+ */
+
 package com.zero.paymentprocessor.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.NotEmpty;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class UserLoginDto {
     @NotEmpty(message = "Username cannot be empty")
     private String username;

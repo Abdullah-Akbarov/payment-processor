@@ -1,3 +1,7 @@
+/**
+ * This enum is used to response some messages to api.
+ */
+
 package com.zero.paymentprocessor.model;
 
 public enum MessageModel {

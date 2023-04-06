@@ -1,3 +1,7 @@
+/**
+ * This class creates entity of User in database.
+ */
+
 package com.zero.paymentprocessor.domain;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +37,7 @@ public class User implements UserDetails {
     private String lastName;
     @OneToMany
     private Set<Card> cards;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

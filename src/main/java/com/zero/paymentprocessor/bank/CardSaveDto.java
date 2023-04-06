@@ -1,9 +1,14 @@
+/**
+ * This class is used to transfer card details from user.
+ */
+
 package com.zero.paymentprocessor.bank;
 
 import com.zero.paymentprocessor.domain.enums.CardCategory;
 import com.zero.paymentprocessor.domain.enums.CardType;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -11,6 +16,7 @@ import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class CardSaveDto {
     @Size(min = 16, max = 16, message = "Wrong card number, card number should be 16 digits")
     @Pattern(regexp = "\\d+", message = "Card number can only contain digits")

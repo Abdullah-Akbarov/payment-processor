@@ -1,3 +1,8 @@
+/**
+ * This interface is used for retrieving, updating, deleting
+ * data from card table.
+ */
+
 package com.zero.paymentprocessor.repository;
 
 import com.zero.paymentprocessor.domain.Card;

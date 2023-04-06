@@ -9,6 +9,8 @@ import com.zero.paymentprocessor.repository.UserRepository;
 import com.zero.paymentprocessor.service.AuthService;
 import com.zero.paymentprocessor.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,29 +24,53 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final ModelMapper mapper;
     private final JwtTokenUtil jwtTokenUtil;
+    private static final Logger logger = LogManager.getLogger(AuthServiceImpl.class);
 
+    /**
+     * This method is used authenticate existing user.
+     *
+     * @param userLoginDto User login details.
+     * @return jwt token.
+     */
     @Override
     public ResponseModel login(UserLoginDto userLoginDto) {
+        logger.info(">> login: username=" + userLoginDto.getUsername());
         Optional<User> username = userRepository.findByUsername(userLoginDto.getUsername());
         if (username.isPresent() && encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
+            logger.info(">> login: success");
             return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(username.get()));
         }
+        logger.warn("<< login: Authentication failed");
         return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
     }
 
+    /**
+     * This method is used to save new User entity in database.
+     *
+     * @param userDto The User information to save.
+     * @return jwt token.
+     */
     @Override
     public ResponseModel register(UserDto userDto) {
+        logger.info(">> register: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
         if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
+            logger.warn("<< register: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         User user = mapper.map(userDto, User.class);
         encodePassword(user);
         User save = userRepository.save(user);
         if (save.getId() != null) {
+            logger.info(">> register: Success");
             return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(save));
         }
+        logger.warn("<< register: Couldn't save record");
         return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
     }
+
+    /**
+     * This method encodes User password.
+     */
     private void encodePassword(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
     }

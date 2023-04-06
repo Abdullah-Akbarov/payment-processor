@@ -1,3 +1,7 @@
+/**
+ * This class provides configuration of important beans
+ */
+
 package com.zero.paymentprocessor.config;
 
 import com.zero.paymentprocessor.repository.UserRepository;
@@ -18,6 +22,7 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class SystemConfig {
     private final UserRepository userRepository;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -37,6 +42,7 @@ public class SystemConfig {
     public HttpHeaders headers() {
         return new HttpHeaders();
     }
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username)

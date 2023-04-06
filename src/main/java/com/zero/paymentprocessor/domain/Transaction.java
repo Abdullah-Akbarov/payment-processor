@@ -1,5 +1,8 @@
-package com.zero.paymentprocessor.domain;
+/**
+ * This class creates entity of Transaction in database.
+ */
 
+package com.zero.paymentprocessor.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

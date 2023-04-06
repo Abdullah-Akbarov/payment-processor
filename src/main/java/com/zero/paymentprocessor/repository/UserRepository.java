@@ -1,3 +1,9 @@
+/**
+ * This interface is used for retrieving, updating, deleting
+ * data from user table.
+ */
+
+
 package com.zero.paymentprocessor.repository;
 
 import com.zero.paymentprocessor.domain.User;

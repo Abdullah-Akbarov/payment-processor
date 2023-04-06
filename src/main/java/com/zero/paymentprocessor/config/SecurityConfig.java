@@ -1,3 +1,7 @@
+/**
+ * This class configures security section of the program
+ */
+
 package com.zero.paymentprocessor.config;
 
 import com.zero.paymentprocessor.filter.JwtRequestFilter;
@@ -19,9 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf().disable().formLogin().loginPage("/auth/login").permitAll().and()
                 .authorizeRequests().
-                antMatchers("/auth/**", "/bank/**"
+                antMatchers("/auth/register", "/bank/**"
                 ).permitAll().anyRequest()
                 .authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()

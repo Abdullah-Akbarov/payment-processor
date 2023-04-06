@@ -1,3 +1,7 @@
+/**
+ * This class creates entity of card in database.
+ */
+
 package com.zero.paymentprocessor.domain;
 
 import com.zero.paymentprocessor.domain.enums.CardCategory;
