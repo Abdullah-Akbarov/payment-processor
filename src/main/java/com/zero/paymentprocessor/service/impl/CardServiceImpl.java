@@ -12,8 +12,7 @@ import com.zero.paymentprocessor.repository.CardRepository;
 import com.zero.paymentprocessor.repository.TransactionRepository;
 import com.zero.paymentprocessor.service.CardService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -30,10 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
-    private static final Logger logger = LogManager.getLogger(CardServiceImpl.class);
     private final RestTemplate restTemplate;
     private final CardRepository cardRepository;
     private final ModelMapper mapper;
@@ -49,10 +48,10 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public ResponseModel addCard(CardDto cardDto) {
-        logger.info(">> addCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
+        log.info(">> addCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
                 "expireDate=" + cardDto.getExpireDate());
         if (cardRepository.findByCardNumber(cardDto.getCardNumber()).isPresent()) {
-            logger.warn("<< addCard: Record already exist");
+            log.warn("<< addCard: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         encrypt(cardDto);
@@ -62,13 +61,13 @@ public class CardServiceImpl implements CardService {
             card.setUser((User) authentication.getPrincipal());
             Card save = cardRepository.save(card);
             if (save.getId() != null) {
-                logger.warn(">> addCard: Success");
+                log.info("<< addCard: Success");
                 return new ResponseModel(MessageModel.SUCCESS);
             }
-            logger.warn("<< addCard: Couldn't save record");
+            log.warn("<< addCard: Couldn't save record");
             return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
         }
-        logger.warn("<< addCard: Card not found");
+        log.warn("<< addCard: Card not found");
         return new ResponseModel(MessageModel.CARD_NOT_FOUND);
     }
 
@@ -79,21 +78,21 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public ResponseModel removeCard(String cardNumber) {
-        logger.info(">> removeCard: cardNumber=" + cardNumber);
+        log.info(">> removeCard: cardNumber=" + cardNumber);
         if (isAuthorized(cardNumber) == null) {
-            logger.warn("<< removeCard: Unauthorized");
+            log.warn("<< removeCard: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
         if (byCardNumber.isPresent()) {
             if (cardRepository.deleteCardByCardNumber(cardNumber) == 1) {
-                logger.info(">> removeCard: Success");
+                log.info("<< removeCard: Success");
                 return new ResponseModel(MessageModel.SUCCESS);
             }
-            logger.warn("<< removeCard: Couldn't delete record");
+            log.warn("<< removeCard: Couldn't delete record");
             return new ResponseModel(MessageModel.COULD_NOT_DELETE_RECORD);
         }
-        logger.warn("<< removeCard: Card not found");
+        log.warn("<< removeCard: Card not found");
         return new ResponseModel(MessageModel.CARD_NOT_FOUND);
     }
 
@@ -104,14 +103,14 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public ResponseModel transfer(TransactionDto transactionDto) {
-        logger.info(">> transfer: " + transactionDto);
+        log.info(">> transfer: " + transactionDto);
         User user = isAuthorized(transactionDto.getSender());
         if (user == null) {
-            logger.warn("<< transfer: Unauthorized");
+            log.warn("<< transfer: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
         if (!checkCard(transactionDto.getReceiver()) || !checkCard(transactionDto.getSender())) {
-            logger.warn("<< transfer: Not found");
+            log.warn("<< transfer: Not found");
             return new ResponseModel(MessageModel.NOT_FOUND);
         }
         Double balance = getBalance(transactionDto.getSender());
@@ -125,28 +124,28 @@ public class CardServiceImpl implements CardService {
                     map.setUser(user);
                     transactionRepository.save(map);
                 }
-                logger.info(">> transfer: Success");
+                log.info("<< transfer: Success");
                 return new ResponseModel(MessageModel.SUCCESS);
             }
-            logger.warn("<< transfer: Insufficient balance");
+            log.warn("<< transfer: Insufficient balance");
             return new ResponseModel(MessageModel.INSUFFICIENT_BALANCE);
         }
-        logger.warn("<< transfer: System Error");
+        log.warn("<< transfer: System Error");
         return new ResponseModel(MessageModel.SYSTEM_ERROR);
     }
 
     @Override
     public ResponseModel balance(String cardNumber) {
         if (isAuthorized(cardNumber) == null) {
-            logger.warn("<< balance: Unauthorized");
+            log.warn("<< balance: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
         Double balance = getBalance(cardNumber);
         if (balance != null) {
-            logger.info(">> balance: Success");
+            log.info("<< balance: Success");
             return new ResponseModel(MessageModel.SUCCESS, balance);
         }
-        logger.warn("<< balance: Card not found");
+        log.warn("<< balance: Card not found");
         return new ResponseModel(MessageModel.CARD_NOT_FOUND);
     }
 

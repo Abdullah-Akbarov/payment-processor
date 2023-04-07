@@ -5,8 +5,7 @@ import com.zero.paymentprocessor.dto.CardDto;
 import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.encrypt.Encryptors;
@@ -16,10 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class CardService {
-    private static final Logger logger = LogManager.getLogger(CardService.class);
     private final PasswordEncoder encoder;
     private final CardRepository cardRepository;
     private final ModelMapper mapper;
@@ -32,13 +31,13 @@ public class CardService {
      * @param cardNumber The card number to find card.
      */
     public ResponseModel getCard(String cardNumber) {
-        logger.info(">> getCard: cardNumber=" + cardNumber);
+        log.info(">> getCard: cardNumber=" + cardNumber);
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
         if (byCardNumber.isPresent()) {
-            logger.info(">> getCard: success");
+            log.info("<< getCard: success");
             return new ResponseModel(MessageModel.SUCCESS);
         }
-        logger.warn("<< getCard: Not found");
+        log.warn("<< getCard: Not found");
         return new ResponseModel(MessageModel.NOT_FOUND);
     }
 
@@ -49,13 +48,13 @@ public class CardService {
      * @return balance of the card;
      */
     public ResponseModel getBalance(String cardNumber) {
-        logger.info(">> getBalance: cardNumber=" + cardNumber);
+        log.info(">> getBalance: cardNumber=" + cardNumber);
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
         if (byCardNumber.isPresent()) {
-            logger.info(">> getBalance: Success");
+            log.info("<< getBalance: Success");
             return new ResponseModel(MessageModel.SUCCESS, byCardNumber.get().getBalance());
         }
-        logger.warn("<< getBalance: Not found");
+        log.warn("<< getBalance: Not found");
         return new ResponseModel(MessageModel.NOT_FOUND);
     }
 
@@ -65,18 +64,18 @@ public class CardService {
      * @param cardDto The card data.
      */
     public ResponseModel validateCard(CardDto cardDto) {
-        logger.info(">> validateCard: " + cardDto);
+        log.info(">> validateCard: " + cardDto);
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardDto.getCardNumber());
         if (byCardNumber.isPresent()) {
             String decrypt = decrypt(cardDto.getPassCode());
             if (encoder.matches(decrypt, byCardNumber.get().getPassCode()) && cardDto.getExpireDate().equals(byCardNumber.get().getExpireDate())) {
-                logger.info(">> validateCard: Success");
+                log.info("<< validateCard: Success");
                 return new ResponseModel(MessageModel.SUCCESS);
             }
-            logger.warn("<< validateCard: Authentication failed");
+            log.warn("<< validateCard: Authentication failed");
             return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
         }
-        logger.warn("<< validateCard: Not found");
+        log.warn("<< validateCard: Not found");
         return new ResponseModel(MessageModel.NOT_FOUND);
     }
 
@@ -86,19 +85,19 @@ public class CardService {
      * @param cardSaveDto The card dto to be saved and mapped as entity.
      */
     public ResponseModel saveCard(CardSaveDto cardSaveDto) {
-        logger.info(">> saveCard: " + cardSaveDto);
+        log.info(">> saveCard: " + cardSaveDto);
         if (cardRepository.findByCardNumber(cardSaveDto.getCardNumber()).isPresent()) {
-            logger.warn(">> saveCard: Record already exist");
+            log.warn("<< saveCard: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         Card card = mapper.map(cardSaveDto, Card.class);
         encodePassCode(card);
         Card save = cardRepository.save(card);
         if (save.getId() != null) {
-            logger.info(">> saveCard: Success");
+            log.info("<< saveCard: Success");
             return new ResponseModel(MessageModel.SUCCESS);
         }
-        logger.warn("<< saveCard: Couldn't save record");
+        log.warn("<< saveCard: Couldn't save record");
         return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
     }
 
@@ -108,16 +107,16 @@ public class CardService {
      * @param balanceDto The balance details.
      */
     public ResponseModel updateBalance(BalanceDto balanceDto) {
-        logger.info(">> updateBalance: " + balanceDto);
+        log.info(">> updateBalance: " + balanceDto);
         Optional<Card> byCardNumber = cardRepository.findByCardNumber(balanceDto.getCardNumber());
         Card card = byCardNumber.get();
         card.setBalance(card.getBalance() + balanceDto.getAmount());
         Card save = cardRepository.save(card);
         if (save.getId() != null) {
-            logger.info(">> updateBalance: Success");
+            log.info("<< updateBalance: Success");
             return new ResponseModel(MessageModel.SUCCESS);
         }
-        logger.warn("<< updateBalance: Couldn't update record");
+        log.warn("<< updateBalance: Couldn't update record");
         return new ResponseModel(MessageModel.COULD_NOT_UPDATE_RECORD);
     }
 

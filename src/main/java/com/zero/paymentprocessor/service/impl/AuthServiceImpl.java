@@ -9,14 +9,14 @@ import com.zero.paymentprocessor.repository.UserRepository;
 import com.zero.paymentprocessor.service.AuthService;
 import com.zero.paymentprocessor.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -24,7 +24,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final ModelMapper mapper;
     private final JwtTokenUtil jwtTokenUtil;
-    private static final Logger logger = LogManager.getLogger(AuthServiceImpl.class);
 
     /**
      * This method is used authenticate existing user.
@@ -34,13 +33,13 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public ResponseModel login(UserLoginDto userLoginDto) {
-        logger.info(">> login: username=" + userLoginDto.getUsername());
+        log.info(">> login: username=" + userLoginDto.getUsername());
         Optional<User> username = userRepository.findByUsername(userLoginDto.getUsername());
         if (username.isPresent() && encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
-            logger.info(">> login: success");
+            log.info("<< login: success");
             return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(username.get()));
         }
-        logger.warn("<< login: Authentication failed");
+        log.warn("<< login: Authentication failed");
         return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
     }
 
@@ -52,19 +51,19 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public ResponseModel register(UserDto userDto) {
-        logger.info(">> register: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
+        log.info(">> register: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
         if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
-            logger.warn("<< register: Record already exist");
+            log.warn("<< register: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         User user = mapper.map(userDto, User.class);
         encodePassword(user);
         User save = userRepository.save(user);
         if (save.getId() != null) {
-            logger.info(">> register: Success");
+            log.info("<< register: Success");
             return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(save));
         }
-        logger.warn("<< register: Couldn't save record");
+        log.warn("<< register: Couldn't save record");
         return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
     }
 

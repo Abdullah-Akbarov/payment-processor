@@ -5,8 +5,7 @@ import com.zero.paymentprocessor.dto.UserLoginDto;
 import com.zero.paymentprocessor.model.ResponseModel;
 import com.zero.paymentprocessor.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,9 +13,9 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Log4j2
 public class AuthController {
     private final AuthService authService;
-    private static final Logger logger = LogManager.getLogger(AuthController.class);
 
     /**
      * This method handles GET requests to the /auth/login endpoint.
@@ -27,7 +26,7 @@ public class AuthController {
      */
     @GetMapping("/login")
     public ResponseModel login(@Valid @RequestBody UserLoginDto userLoginDto) {
-        logger.info(">> login: username=" + userLoginDto.getUsername());
+        log.info(">> login: username=" + userLoginDto.getUsername());
         return authService.login(userLoginDto);
     }
 
@@ -40,7 +39,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     ResponseModel saveUser(@Valid @RequestBody UserDto userDto) {
-        logger.info(">> saveUser: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
+        log.info(">> saveUser: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
         return authService.register(userDto);
     }
 }

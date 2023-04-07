@@ -5,17 +5,16 @@ import com.zero.paymentprocessor.dto.TransactionDto;
 import com.zero.paymentprocessor.model.ResponseModel;
 import com.zero.paymentprocessor.service.CardService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Log4j2
 @RestController
 @RequestMapping("/cards")
 @RequiredArgsConstructor
 public class CardController {
-    private static final Logger logger = LogManager.getLogger(CardController.class);
     private final CardService cardService;
 
     /**
@@ -26,7 +25,7 @@ public class CardController {
      */
     @PostMapping
     public ResponseModel saveCard(@Valid @RequestBody CardDto cardDto) {
-        logger.info(">> saveCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
+        log.info(">> saveCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
                 "expireDate=" + cardDto.getExpireDate());
         return cardService.addCard(cardDto);
     }
@@ -39,7 +38,7 @@ public class CardController {
      */
     @DeleteMapping("/remove")
     public ResponseModel removeCard(@RequestParam String cardNumber) {
-        logger.info(">> removeCard: cardNumber=" + cardNumber);
+        log.info(">> removeCard: cardNumber=" + cardNumber);
         return cardService.removeCard(cardNumber);
     }
 
@@ -51,7 +50,7 @@ public class CardController {
      */
     @PutMapping("/transfer")
     public ResponseModel transfer(@Valid @RequestBody TransactionDto transactionDto) {
-        logger.info(">> transfer: " + transactionDto);
+        log.info(">> transfer: " + transactionDto);
         return cardService.transfer(transactionDto);
     }
 
@@ -63,7 +62,7 @@ public class CardController {
      */
     @GetMapping("/balance")
     public ResponseModel getBalance(@RequestParam String cardNumber) {
-        logger.info(">> getBalance: cardNumber=" + cardNumber);
+        log.info(">> getBalance: cardNumber=" + cardNumber);
         return cardService.balance(cardNumber);
     }
 

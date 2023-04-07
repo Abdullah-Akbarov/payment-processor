@@ -4,17 +4,16 @@ import com.zero.paymentprocessor.dto.BalanceDto;
 import com.zero.paymentprocessor.dto.CardDto;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Log4j2
 @RestController
 @RequestMapping("/bank")
 @RequiredArgsConstructor
 public class BankController {
-    private static final Logger logger = LogManager.getLogger(BankController.class);
     private final CardService cardService;
 
     /**
@@ -25,7 +24,7 @@ public class BankController {
      */
     @PostMapping("/validate")
     public ResponseModel validate(@Valid @RequestBody CardDto cardDto) {
-        logger.info(">> validate: " + cardDto);
+        log.info(">> validate: " + cardDto);
         return cardService.validateCard(cardDto);
     }
 
@@ -38,7 +37,7 @@ public class BankController {
      */
     @GetMapping("/balance")
     public ResponseModel getBalance(@RequestParam String cardNumber) {
-        logger.info(">> getBalance: cardNumber=" + cardNumber);
+        log.info(">> getBalance: cardNumber=" + cardNumber);
         return cardService.getBalance(cardNumber);
     }
 
@@ -50,7 +49,7 @@ public class BankController {
      */
     @GetMapping("/check")
     public ResponseModel checkCard(@RequestParam String cardNumber) {
-        logger.info(">> checkCard: cardNumber=" + cardNumber);
+        log.info(">> checkCard: cardNumber=" + cardNumber);
         return cardService.getCard(cardNumber);
     }
 
@@ -62,7 +61,7 @@ public class BankController {
      */
     @PostMapping
     public ResponseModel saveCard(@Valid @RequestBody CardSaveDto cardSaveDto) {
-        logger.info(">> saveCard cardNumber = " + cardSaveDto);
+        log.info(">> saveCard cardNumber = " + cardSaveDto);
         return cardService.saveCard(cardSaveDto);
     }
 
@@ -73,7 +72,7 @@ public class BankController {
      */
     @PutMapping("/update")
     public ResponseModel updateBalance(@RequestBody BalanceDto balanceDto) {
-        logger.info(">> updateBalance: cardNumber=" + balanceDto);
+        log.info(">> updateBalance: cardNumber=" + balanceDto);
         return cardService.updateBalance(balanceDto);
     }
 }
