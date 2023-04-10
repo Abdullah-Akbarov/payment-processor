@@ -8,6 +8,7 @@ import com.zero.paymentprocessor.dto.CardDto;
 import com.zero.paymentprocessor.dto.TransactionDto;
 import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
+import com.zero.paymentprocessor.projection.CardProjection;
 import com.zero.paymentprocessor.repository.CardRepository;
 import com.zero.paymentprocessor.repository.TransactionRepository;
 import com.zero.paymentprocessor.service.CardService;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -141,6 +143,25 @@ public class CardServiceImpl implements CardService {
             return new ResponseModel(MessageModel.SUCCESS, balance);
         }
         log.warn("<< balance: Card not found");
+        return new ResponseModel(MessageModel.CARD_NOT_FOUND);
+    }
+
+    /**
+     * This method retrieves all card from database.
+     *
+     * @return list of cards;
+     */
+    @Override
+    public ResponseModel getAllCards() {
+        log.info(">> getAllCards");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        List<CardProjection> byUser = cardRepository.findCardByUser(user);
+        if (!byUser.isEmpty()) {
+            log.info("<< getAllCards: Success");
+            return new ResponseModel(MessageModel.SUCCESS, byUser);
+        }
+        log.warn("<< getAllCards: Card not found");
         return new ResponseModel(MessageModel.CARD_NOT_FOUND);
     }
 

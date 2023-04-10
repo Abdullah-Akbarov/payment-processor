@@ -26,7 +26,7 @@ public class Card {
     @Column(unique = true)
     private String cardNumber;
     @Column(nullable = false)
-    private String CardHolder;
+    private String cardHolder;
     @Enumerated(EnumType.STRING)
     private CardType cardType;
     @Enumerated(EnumType.STRING)

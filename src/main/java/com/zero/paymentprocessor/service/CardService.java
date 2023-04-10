@@ -12,4 +12,6 @@ public interface CardService {
     ResponseModel transfer(TransactionDto transactionDto);
 
     ResponseModel balance(String cardNumber);
+
+    ResponseModel getAllCards();
 }

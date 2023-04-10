@@ -72,4 +72,13 @@ public class CardController {
         return cardService.balance(cardNumber);
     }
 
+    /**
+     * This method handles GET request to the /cards/all endpoint.
+     * It retrieves card all cards that is connected to user.
+     */
+    @GetMapping("/all")
+    public ResponseModel getAllCards() {
+        log.info(">> getAllCards");
+        return cardService.getAllCards();
+    }
 }
