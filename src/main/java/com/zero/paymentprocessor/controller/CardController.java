@@ -2,6 +2,7 @@ package com.zero.paymentprocessor.controller;
 
 import com.zero.paymentprocessor.dto.CardDto;
 import com.zero.paymentprocessor.dto.TransactionDto;
+import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import com.zero.paymentprocessor.service.CardService;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,14 @@ public class CardController {
      */
     @PostMapping
     public ResponseModel saveCard(@Valid @RequestBody CardDto cardDto) {
-        log.info(">> saveCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
-                "expireDate=" + cardDto.getExpireDate());
-        return cardService.addCard(cardDto);
+        try {
+            log.info(">> saveCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
+                    "expireDate=" + cardDto.getExpireDate());
+            return cardService.addCard(cardDto);
+        } catch (Exception e) {
+            log.warn("<< saveCard: Couldn't save record");
+            return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD, e);
+        }
     }
 
     /**

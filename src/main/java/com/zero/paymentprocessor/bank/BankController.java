@@ -2,6 +2,7 @@ package com.zero.paymentprocessor.bank;
 
 import com.zero.paymentprocessor.dto.BalanceDto;
 import com.zero.paymentprocessor.dto.CardDto;
+import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -61,8 +62,13 @@ public class BankController {
      */
     @PostMapping
     public ResponseModel saveCard(@Valid @RequestBody CardSaveDto cardSaveDto) {
-        log.info(">> saveCard cardNumber = " + cardSaveDto);
-        return cardService.saveCard(cardSaveDto);
+        try {
+            log.info(">> saveCard " + cardSaveDto);
+            return cardService.saveCard(cardSaveDto);
+        } catch (Exception e) {
+            log.warn("<< saveCard: Couldn't save record");
+            return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD, e);
+        }
     }
 
     /**

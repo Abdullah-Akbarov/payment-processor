@@ -50,7 +50,7 @@ public class CardServiceImpl implements CardService {
     public ResponseModel addCard(CardDto cardDto) {
         log.info(">> addCard: cardNumber=" + cardDto.getCardNumber() + " cardHolder=" + cardDto.getCardHolder() +
                 "expireDate=" + cardDto.getExpireDate());
-        if (cardRepository.findByCardNumber(cardDto.getCardNumber()).isPresent()) {
+        if (cardRepository.existsByCardNumber(cardDto.getCardNumber())) {
             log.warn("<< addCard: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
@@ -60,12 +60,8 @@ public class CardServiceImpl implements CardService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             card.setUser((User) authentication.getPrincipal());
             Card save = cardRepository.save(card);
-            if (save.getId() != null) {
-                log.info("<< addCard: Success");
-                return new ResponseModel(MessageModel.SUCCESS);
-            }
-            log.warn("<< addCard: Couldn't save record");
-            return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
+            log.info("<< addCard: Success");
+            return new ResponseModel(MessageModel.SUCCESS);
         }
         log.warn("<< addCard: Card not found");
         return new ResponseModel(MessageModel.CARD_NOT_FOUND);
@@ -83,8 +79,7 @@ public class CardServiceImpl implements CardService {
             log.warn("<< removeCard: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
-        Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
-        if (byCardNumber.isPresent()) {
+        if (cardRepository.existsByCardNumber(cardNumber)) {
             if (cardRepository.deleteCardByCardNumber(cardNumber) == 1) {
                 log.info("<< removeCard: Success");
                 return new ResponseModel(MessageModel.SUCCESS);
@@ -120,7 +115,7 @@ public class CardServiceImpl implements CardService {
                 boolean sender = updateBalance(new BalanceDto(transactionDto.getSender(), -1 * transactionDto.getAmount()));
                 boolean receiver = updateBalance(new BalanceDto(transactionDto.getReceiver(), transactionDto.getAmount()));
                 if (sender && receiver) {
-                    transactionDto.setDateTime(new Timestamp(System.currentTimeMillis()));
+                    map.setDateTime(new Timestamp(System.currentTimeMillis()));
                     map.setUser(user);
                     transactionRepository.save(map);
                 }

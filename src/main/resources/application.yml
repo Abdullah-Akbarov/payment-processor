@@ -14,5 +14,6 @@ spring:
       ddl-auto: update
 jwt:
   secret: mySecretKeyword
+  validity: 3_600_000
 secret:
   key: myBankSecretKey

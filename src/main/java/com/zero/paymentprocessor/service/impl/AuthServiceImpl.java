@@ -35,9 +35,13 @@ public class AuthServiceImpl implements AuthService {
     public ResponseModel login(UserLoginDto userLoginDto) {
         log.info(">> login: username=" + userLoginDto.getUsername());
         Optional<User> username = userRepository.findByUsername(userLoginDto.getUsername());
-        if (username.isPresent() && encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
+        if (!username.isPresent()) {
+            log.warn("<< login: Not found");
+            return new ResponseModel(MessageModel.NOT_FOUND);
+        }
+        if (encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
             log.info("<< login: success");
-            return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(username.get()));
+            return new ResponseModel(MessageModel.SUCCESS, "Bearer " + jwtTokenUtil.generateToken(username.get()));
         }
         log.warn("<< login: Authentication failed");
         return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
@@ -52,19 +56,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseModel register(UserDto userDto) {
         log.info(">> register: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
-        if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
+        if (userRepository.existsByUsername(userDto.getUsername())) {
             log.warn("<< register: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         User user = mapper.map(userDto, User.class);
         encodePassword(user);
         User save = userRepository.save(user);
-        if (save.getId() != null) {
-            log.info("<< register: Success");
-            return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(save));
-        }
-        log.warn("<< register: Couldn't save record");
-        return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
+        log.info("<< register: Success");
+        return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(save));
     }
 
     /**

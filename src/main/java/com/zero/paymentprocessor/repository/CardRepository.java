@@ -23,4 +23,7 @@ public interface CardRepository extends JpaRepository<Card, Long> {
     @Modifying
     @Transactional
     Integer deleteCardByCardNumber(@Param(value = "cardNumber") String cardNumber);
+
+    boolean existsByCardNumber(String cardNumber);
+
 }

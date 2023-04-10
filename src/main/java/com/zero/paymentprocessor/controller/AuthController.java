@@ -2,6 +2,7 @@ package com.zero.paymentprocessor.controller;
 
 import com.zero.paymentprocessor.dto.UserDto;
 import com.zero.paymentprocessor.dto.UserLoginDto;
+import com.zero.paymentprocessor.model.MessageModel;
 import com.zero.paymentprocessor.model.ResponseModel;
 import com.zero.paymentprocessor.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Log4j2
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Log4j2
 public class AuthController {
     private final AuthService authService;
 
@@ -39,7 +40,12 @@ public class AuthController {
      */
     @PostMapping("/register")
     ResponseModel saveUser(@Valid @RequestBody UserDto userDto) {
-        log.info(">> saveUser: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
-        return authService.register(userDto);
+        try {
+            log.info(">> saveUser: username=" + userDto.getUsername() + " phoneNumber=" + userDto.getPhoneNumber());
+            return authService.register(userDto);
+        } catch (Exception e) {
+            log.warn("<< saveUser: Couldn't save record");
+            return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD, e);
+        }
     }
 }

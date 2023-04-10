@@ -86,19 +86,15 @@ public class CardService {
      */
     public ResponseModel saveCard(CardSaveDto cardSaveDto) {
         log.info(">> saveCard: " + cardSaveDto);
-        if (cardRepository.findByCardNumber(cardSaveDto.getCardNumber()).isPresent()) {
+        if (cardRepository.existsByCardNumber(cardSaveDto.getCardNumber())) {
             log.warn("<< saveCard: Record already exist");
             return new ResponseModel(MessageModel.RECORD_AlREADY_EXIST);
         }
         Card card = mapper.map(cardSaveDto, Card.class);
         encodePassCode(card);
         Card save = cardRepository.save(card);
-        if (save.getId() != null) {
-            log.info("<< saveCard: Success");
-            return new ResponseModel(MessageModel.SUCCESS);
-        }
-        log.warn("<< saveCard: Couldn't save record");
-        return new ResponseModel(MessageModel.COULD_NOT_SAVE_RECORD);
+        log.info("<< saveCard: Success");
+        return new ResponseModel(MessageModel.SUCCESS);
     }
 
     /**
@@ -112,12 +108,8 @@ public class CardService {
         Card card = byCardNumber.get();
         card.setBalance(card.getBalance() + balanceDto.getAmount());
         Card save = cardRepository.save(card);
-        if (save.getId() != null) {
-            log.info("<< updateBalance: Success");
-            return new ResponseModel(MessageModel.SUCCESS);
-        }
-        log.warn("<< updateBalance: Couldn't update record");
-        return new ResponseModel(MessageModel.COULD_NOT_UPDATE_RECORD);
+        log.info("<< updateBalance: Success");
+        return new ResponseModel(MessageModel.SUCCESS);
     }
 
     /**
