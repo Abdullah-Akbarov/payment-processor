@@ -1,6 +1,7 @@
 package com.zero.paymentprocessor.service.impl;
 
 import com.zero.paymentprocessor.domain.User;
+import com.zero.paymentprocessor.dto.JwtDto;
 import com.zero.paymentprocessor.dto.UserDto;
 import com.zero.paymentprocessor.dto.UserLoginDto;
 import com.zero.paymentprocessor.model.MessageModel;
@@ -41,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
         }
         if (encoder.matches(userLoginDto.getPassword(), username.get().getPassword())) {
             log.info("<< login: success");
-            return new ResponseModel(MessageModel.SUCCESS, "Bearer " + jwtTokenUtil.generateToken(username.get()));
+            return new ResponseModel(MessageModel.SUCCESS, new JwtDto("Bearer", jwtTokenUtil.generateToken(username.get())));
         }
         log.warn("<< login: Authentication failed");
         return new ResponseModel(MessageModel.AUTHENTICATION_FAILED);
@@ -64,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         encodePassword(user);
         User save = userRepository.save(user);
         log.info("<< register: Success");
-        return new ResponseModel(MessageModel.SUCCESS, jwtTokenUtil.generateToken(save));
+        return new ResponseModel(MessageModel.SUCCESS);
     }
 
     /**

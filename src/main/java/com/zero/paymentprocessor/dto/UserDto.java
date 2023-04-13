@@ -5,6 +5,7 @@
 package com.zero.paymentprocessor.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -12,9 +13,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+@Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class UserDto {
     private Long id;
     @Size(min = 8, max = 32, message = "password must be minimum 8 maximum 32 characters long")

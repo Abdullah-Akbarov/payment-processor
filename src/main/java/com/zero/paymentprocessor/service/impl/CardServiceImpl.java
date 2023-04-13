@@ -12,6 +12,7 @@ import com.zero.paymentprocessor.projection.CardProjection;
 import com.zero.paymentprocessor.repository.CardRepository;
 import com.zero.paymentprocessor.repository.TransactionRepository;
 import com.zero.paymentprocessor.service.CardService;
+import com.zero.paymentprocessor.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -29,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Log4j2
 @Service
@@ -40,6 +40,7 @@ public class CardServiceImpl implements CardService {
     private final ModelMapper mapper;
     private final HttpHeaders headers;
     private final TransactionRepository transactionRepository;
+    private final Utils utils;
     @Value("${secret.key}")
     private String secretKey;
 
@@ -77,7 +78,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public ResponseModel removeCard(String cardNumber) {
         log.info(">> removeCard: cardNumber=" + cardNumber);
-        if (isAuthorized(cardNumber) == null) {
+        if (utils.isAuthorized(cardNumber) == null) {
             log.warn("<< removeCard: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
@@ -101,7 +102,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public ResponseModel transfer(TransactionDto transactionDto) {
         log.info(">> transfer: " + transactionDto);
-        User user = isAuthorized(transactionDto.getSender());
+        User user = utils.isAuthorized(transactionDto.getSender());
         if (user == null) {
             log.warn("<< transfer: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
@@ -133,7 +134,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public ResponseModel balance(String cardNumber) {
-        if (isAuthorized(cardNumber) == null) {
+        if (utils.isAuthorized(cardNumber) == null) {
             log.warn("<< balance: Unauthorized");
             return new ResponseModel(MessageModel.UNAUTHORIZED);
         }
@@ -255,21 +256,5 @@ public class CardServiceImpl implements CardService {
         HttpEntity<CardDto> entity = new HttpEntity<>(cardDto, headers);
         ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
         return response.getBody().status == 200;
-    }
-
-    /**
-     * This method is for authorizing user for some action.
-     *
-     * @param cardNumber
-     * @return User entity.
-     */
-    private User isAuthorized(String cardNumber) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        Optional<Card> byCardNumber = cardRepository.findByCardNumber(cardNumber);
-        if (!byCardNumber.isPresent()) {
-            return null;
-        }
-        return byCardNumber.get().getUser().getId() == user.getId() ? user : null;
     }
 }

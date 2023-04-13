@@ -24,9 +24,11 @@ public class TransactionController {
      * It returns all transaction history of today for a card.
      */
     @GetMapping("/today")
-    public ResponseModel getTransactionForToday(@RequestParam String cardNumber, @RequestParam int page) {
+    public ResponseModel getTransactionForToday(@RequestParam String cardNumber,
+                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info(">> getTransactionForToday: cardNumber=" + cardNumber + " page=" + page);
-        return transactionService.getToday(cardNumber, page);
+        return transactionService.getToday(cardNumber, page, size);
     }
 
     /**
@@ -34,8 +36,13 @@ public class TransactionController {
      * It returns all transaction history of picked month for a card.
      */
     @GetMapping("/month")
-    public ResponseModel getTransactionForMonth(@RequestParam int year, @RequestParam int month, @RequestParam String cardNumber, @RequestParam int page) {
-        log.info(">> getTransactionForMonth: year=" + year + " month=" + month + " cardNumber=" + cardNumber + " page=" + page);
+    public ResponseModel getTransactionForMonth(@RequestParam int year,
+                                                @RequestParam int month,
+                                                @RequestParam String cardNumber,
+                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                @RequestParam(value = "size", defaultValue = "10") int size) {
+        log.info(">> getTransactionForMonth: year=" + year + " month=" + month +
+                " cardNumber=" + cardNumber + " page=" + page + " size=" + size);
         if (year < 2022 || year > LocalDate.now().getYear()) {
             log.warn("<< getTransactionForMonth: Invalid year");
             return new ResponseModel(MessageModel.INVALID_YEAR);
@@ -44,7 +51,7 @@ public class TransactionController {
             log.warn("<< getTransactionForMonth: Invalid month");
             return new ResponseModel(MessageModel.INVALID_MONTH);
         }
-        return transactionService.getMonth(year, month, cardNumber, page);
+        return transactionService.getMonth(year, month, cardNumber, page, size);
     }
 
     /**
@@ -52,8 +59,13 @@ public class TransactionController {
      * It returns custom date transaction history of picked month for a card.
      */
     @GetMapping("/custom")
-    public ResponseModel getTransactionForCustom(@RequestParam String startDate, @RequestParam String endDate, @RequestParam String cardNumber, @RequestParam int page) {
-        log.info(">> getTransactionForCustom: startDate=" + startDate + " endDate=" + startDate + " cardNumber=" + cardNumber + " page=" + page);
+    public ResponseModel getTransactionForCustom(@RequestParam String startDate,
+                                                 @RequestParam String endDate,
+                                                 @RequestParam String cardNumber,
+                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+        log.info(">> getTransactionForCustom: startDate=" + startDate +
+                " endDate=" + startDate + " cardNumber=" + cardNumber + " page=" + page + " size=" + size);
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
         if (start.isAfter(end)) {
@@ -65,6 +77,6 @@ public class TransactionController {
             log.warn("<< getTransactionForCustom: Invalid Date");
             return new ResponseModel(MessageModel.INVALID_DATE);
         }
-        return transactionService.getByCustom(start, end, cardNumber, page);
+        return transactionService.getByCustom(start, end, cardNumber, page, size);
     }
 }

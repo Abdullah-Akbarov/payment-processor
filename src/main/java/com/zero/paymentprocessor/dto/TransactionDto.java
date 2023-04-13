@@ -7,6 +7,7 @@ package com.zero.paymentprocessor.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Pattern;
@@ -14,6 +15,7 @@ import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Data
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionDto {

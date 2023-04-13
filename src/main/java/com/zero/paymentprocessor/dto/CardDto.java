@@ -6,6 +6,7 @@ package com.zero.paymentprocessor.dto;
 import com.zero.paymentprocessor.domain.enums.CardCategory;
 import com.zero.paymentprocessor.domain.enums.CardType;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -13,9 +14,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+@Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class CardDto {
     @Size(min = 16, max = 16, message = "Wrong card number, card number should be 16 digits")
     @Pattern(regexp = "\\d+", message = "Card number can only contain digits")
